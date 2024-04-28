@@ -1,0 +1,50 @@
+class Solution {
+public:
+    vector<int> gr[30033];
+    int dis[30003];
+    int cnt[30003];
+    int dfs(int node, int par) {
+        cnt[node]++;
+        for (auto x : gr[node]) {
+            if (x == par)
+                continue;
+            cnt[node] += dfs(x, node);
+        }
+        return cnt[node];
+    }
+    int dfsa(int node, int par) {
+        for (auto x : gr[node]) {
+            if (x == par)
+                continue;
+            dis[node] += dfsa(x, node);
+        }
+        return cnt[node] + dis[node];
+    }
+    vector<int>ans;
+    int N;
+    void dfsb(int node, int par, int cur) {
+        ans[node] = cur;
+        for (auto x : gr[node]) {
+            if (x == par)
+                continue;
+            int super = cur - dis[x] - cnt[x];
+            int newval = super + dis[x] + (N - cnt[x]);
+            dfsb(x, node, newval);
+        }
+    }
+
+    vector<int> sumOfDistancesInTree(int n, vector<vector<int>>& edges) {
+        for (auto x : edges) {
+            gr[x[0]].push_back(x[1]);
+            gr[x[1]].push_back(x[0]);
+        }
+        N = n;
+        memset(dis, 0, sizeof dis);
+        memset(cnt, 0, sizeof cnt);
+        ans.resize(N, 0);
+        dfs(0, 0);
+        dfsa(0, 0);
+        dfsb(0, 0, dis[0]);
+        return ans;
+    }
+};
